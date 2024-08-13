@@ -1,55 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- <html lang="en"> -->
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diffie-Hellman Key Exchange</title>
-<script>
-function generateKeys() {
+    <!-- <meta charset="UTF-8"> -->
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <title>Diffie Hellman</title>
+    <script>
+        function generateKeys(){
 
-    const prime = parseInt(document.getElementById("prime").value);
-    const base = parseInt(document.getElementById("base").value);
-    const alicePrivateKey = parseInt(document.getElementById("alicePrivate").value);
-    const bobPrivateKey = parseInt(document.getElementById("bobPrivate").value);
+            const p=parseInt(document.getElementById('p').value);
+            const a=parseInt(document.getElementById('a').value);
+            const x1=parseInt(document.getElementById('x1').value);
+            const x2=parseInt(document.getElementById('x2').value);
 
+            const y1 = BigInt(a) ** BigInt(x1) % BigInt(p); 
+            const y2 = BigInt(a) ** BigInt(x2) % BigInt(p); 
+   
+            const shared_a = BigInt(y2) ** BigInt(x1) % BigInt(p); 
+            const shared_b = BigInt(y1) ** BigInt(x2) % BigInt(p); 
 
-    // Calculate public key for Alice and Bob
-    const alicePublicKey = BigInt(base) ** BigInt(alicePrivateKey) % BigInt(prime); // Alice's public key
-    const bobPublicKey = BigInt(base) ** BigInt(bobPrivateKey) % BigInt(prime); // Bob's public key
-
-    // Calculate shared secret key for Alice and Bob
-    const aliceSharedKey = BigInt(bobPublicKey) ** BigInt(alicePrivateKey) % BigInt(prime); // Alice's shared key
-    const bobSharedKey = BigInt(alicePublicKey) ** BigInt(bobPrivateKey) % BigInt(prime); // Bob's shared key
-
-    // Display results
-    document.getElementById("alicePublic").innerHTML = alicePublicKey;
-    document.getElementById("bobPublic").innerHTML = bobPublicKey;
-    document.getElementById("aliceShared").innerHTML = aliceSharedKey;
-    document.getElementById("bobShared").innerHTML = bobSharedKey;
-}
-</script>
+            document.getElementById('output').innerHTML=`
+            <p>Alice's public key: ${y1}</p>
+            <p>Bob's public key: ${y2}</p>
+            <p>Shared secret key of Alice: ${shared_a}</p>
+            <p>Shared secret key of Bob: ${shared_b}</p>
+            `;
+        }
+    </script>
 </head>
 <body>
-  <h1>Diffie-Hellman Key Exchange</h1>
-  <label for="prime">Enter Prime (p):</label>
-  <input type="number" id="prime" name="prime" required><br><br>
-  <label for="base">Enter Base (g):</label>
-  <input type="number" id="base" name="base" required><br><br>
-  <label for="alicePrivate">Enter Alice's Private Key:</label>
-  <input type="number" id="alicePrivate" name="alicePrivate" required><br><br>
-  <label for="bobPrivate">Enter Bob's Private Key:</label>
-  <input type="number" id="bobPrivate" name="bobPrivate" required><br><br>
+    <h1>Diffie-Hellman</h1>
+    <label for="p">Enter p: </label>
+    <input type="number" id="p" required><br><br>
+    <label for="a">Enter a: </label>
+    <input type="number" id="a" required><br><br>
+    <label for="alicePri">Enter alice's priv key: </label>
+    <input type="number" id="x1" required><br><br>
+    <label for="bobPri">Enter bob's priv key: </label>
+    <input type="number" id="x2" required><br><br>
 
-  <button onclick="generateKeys()">Perform Key Exchange</button>
-  <div>
-    <h2>Alice's Keys</h2>
-    <p>Public Key: <span id="alicePublic"></span></p>
-    <p>Shared Key: <span id="aliceShared"></span></p>
-  </div>
-  <div>
-    <h2>Bob's Keys</h2>
-    <p>Public Key: <span id="bobPublic"></span></p>
-    <p>Shared Key: <span id="bobShared"></span></p>
-  </div>
+    <button onclick="generateKeys()">Generate Keys</button>
+
+    <div id="output"></div>
+    
 </body>
 </html>
