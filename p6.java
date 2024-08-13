@@ -1,11 +1,11 @@
-//pg6
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.Scanner;
 
-public class p6 {
+public class aes {
 
+    
     public static String encrypt(String strToEncrypt, String secret) {
         try {
             SecretKeySpec s = new SecretKeySpec(secret.getBytes("UTF-8"), "AES");
@@ -55,3 +55,5 @@ public class p6 {
         //sc.close();
     }
 }
+//PBKDF2WithHmacSHA:key
+//AES Encryption:pt
