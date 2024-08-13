@@ -74,7 +74,7 @@ void matVecMult(int mat[][3], int vec[], int res[], int size) {
 }
 
 // Process message (encrypt/decrypt based on mode)
-void processMsg(int mode, int mat[][3], char msg[], int size) {
+void processMsg(int mat[][3], char msg[], int size) {
     int len = strlen(msg);
 
     for (int i = 0; i < len; i += size) {
@@ -98,7 +98,7 @@ void processMsg(int mode, int mat[][3], char msg[], int size) {
 }
 
 int main() {
-    int size, mat[3][3];
+    int size, mat[3][3], invMat[3][3];
     char msg[100], encMsg[100], decMsg[100];
 
     printf("Enter matrix size (2 or 3): ");
@@ -110,15 +110,28 @@ int main() {
             scanf("%d", &mat[i][j]);
         }
     }
+
+    // For simplicity, we're directly entering the inverse matrix here.
+    // In a real application, you'd calculate the inverse of the matrix.
+    printf("Enter inverse key matrix elements:\n");
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            scanf("%d", &invMat[i][j]);
+        }
+    }
+
     printf("Enter the message: ");
     scanf("%s", msg);
     strcpy(encMsg, msg);
-   
-    processMsg(1, mat, encMsg, size);
+
+    // Encrypt the message
+    processMsg(mat, encMsg, size);
     printf("Encrypted message: %s\n", encMsg);
 
-
-    printf("Decrypted message: %s\n", msg);
+    // Decrypt the message
+    strcpy(decMsg, encMsg);
+    processMsg(invMat, decMsg, size);
+    printf("Decrypted message: %s\n", decMsg);
 
     return 0;
 }
