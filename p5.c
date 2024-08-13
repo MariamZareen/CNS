@@ -1,172 +1,184 @@
-#include<stdio.h>  
-int IP[]={2,6,3,1,4,8,5,7}; 
-int inverse[]={4,1,3,5,7,2,8,6}; 
-int s0[4][4]={ 
-{1,0,3,2},  
-{3,2,1,0},  
-{0,2,1,3},  
-{3,1,3,2}  
-}; 
-int s1[4][4]={  
-{0,1,2,3},  
-{2,0,1,3},  
-{3,0,1,0},  
-{2,1,0,3}  
-};  
-int inital_perm(int pt){ 
-    int res=0; 
-    for(int i=0;i<8;i++){ 
-        res|=((pt>>(8-IP[i]))&1)<<(7-i); 
-    } 
-    return res; 
-} 
-int inverse_inital(int ct){ 
-    int res=0; 
-    for(int i=0;i<8;i++){ 
-        res|=((ct>>(8-inverse[i]))&1)<<(7-i); 
-    } 
-    return res; 
-} 
-int main(){ 
-    int pt=0b10010111; 
-    printf("Plaintext is %x\n",pt); 
-    int ct=inital_perm(pt); 
-    printf("Cipher text is %x\n",ct); 
-    int decrypt=inverse_inital(ct); 
-    printf("Decrypted text is %x\n",decrypt); 
-    return 0; 
-}
-
-
-
-
-
+//pg5
 #include<stdio.h>
 #include<string.h>
-int res[2];
-    int p4[]={2,4,3,1};
-    int ep[]={4,1,2,3,2,3,4,1};
-    int s0_mat[][4]={{1,0,3,2},{3,2,1,0},{0,2,1,3}, {3,1,3,2}};
-    int s1_mat[][4]={{0,1,2,3},{2,0,1,3}, {3,0,1,0}, {2,1,0,3}};
-
-int toInt(int a,int b){
-   if(a==0 && b==0) return 0;
-   if(a==0 && b==1) return 1;
-   if(a==1 && b==0) return 2;
-   return 3;
+int result[2];
+int to_digit(int a, int b)
+{
+    int output;
+    if(a==1 && b==1)  output = 3;
+    if(a==0 && b==1)  output = 1;
+    if(a==1 && b==0)  output = 2;   
+    if(a==0 && b==0)  output = 0;
+    return output;
 }
-void toBinary(int n){
-   if(n==0) {
-      res[0]=0;
-      res[1]=0;
-   }else if(n==1){
-      res[0]=0;
-      res[1]=1;
-   }else if(n==2){
-      res[0]=1;
-      res[1]=0;
-   }else{
-     res[0]=1;
-     res[1]=1;
-   }
+void to_binary(int num)
+{
+    if(num == 3) {
+            result[0] = 1;
+            result[1] = 1;
+    }
+     else if(num == 1) {
+        result[0] = 0;
+        result[1] = 1;
+    }
+    else if(num == 2) {
+        result[0] = 1;
+        result[1] = 0;
+    }
+    else if(num == 0) {
+            result[0] = 0;
+            result[1] = 0;
+    }
 }
-void s_round(int left_half[],int right_half[],int key[]){
-    int after_ep[8];
-    int row,col,s0,s1;
-    for(int i=0;i<4;i++){
-        int idx=ep[i];
-        after_ep[i]=right_half[idx-1];
-    }
-    for(int i=4;i<8;i++){
-        int idx=ep[i];
-        after_ep[i]=right_half[idx-1];
-    }
+void main()
+{
+    int i,j,index;
+    int s0=0,s1=0,row=0, col=0;
+    int s0_binary[2], s1_binary[2];
+    int pt[8];
 
-    for(int i=0;i<8;i++){
-        after_ep[i]^=key[i];
-    }
-    int s[4];
-    row=toInt(after_ep[0],after_ep[3]);
-    col=toInt(after_ep[1],after_ep[2]);
-    s0=s0_mat[row][col];
-    toBinary(s0);
-
-    s[0]=res[0];
-    s[1]=res[1];
-
-    row=toInt(after_ep[4],after_ep[7]);
-    col=toInt(after_ep[5],after_ep[6]);
-    s1=s1_mat[row][col];
-    toBinary(s1);
-
-    s[2]=res[0];
-    s[3]=res[1];
+    int k1[8]={1,0,1,0,0,1,0,0};
+    int k2[8]={0,1,0,0,0,0,1,1};  
+    int ip[8]={2,6,3,1,4,8,5,7},ep[8]={4,1,2,3,2,3,4,1},p4[4]={2,4,3,1},ipinverse[8]={4,1,3,5,7,2,8,6};
+    int s_matrix0[4][4] = { {1,0,3,2},{3,2,1,0},{0,2,1,3},{3,1,3,2} };
+    int s_matrix1[4][4] = { {0,1,2,3},{2,0,1,3},{3,0,1,0},{2,1,0,3} };
     
-    int after_p4[4];
-    for(int i=0;i<4;i++){
-        int idx=p4[i];
-        after_p4[i]=s[idx-1];
+    int after_ip[8], after_ep[8], after_p4[4];
+    int S[4], S1[4];
+    int left_after_ip[4], right_after_ip[4];
+    int left_after_one[4], right_after_one[4];
+    int after_ip_inverse[8];
+    int after_one[8], after_two[8];
+
+    printf("\n---->Enter the 8-bit plaintext : ");
+    for(i=0; i<8; i++)
+        scanf("%d",&pt[i]);
+
+    for(i=0; i<8; i++) {
+        index = ip[i];
+        after_ip[i] = pt[index - 1];
+    }
+   
+    for(j=0; j<4; j++)
+        left_after_ip[j] = after_ip[j];
+
+    for(j=0; j<4; j++)
+        right_after_ip[j] = after_ip[j+4];
+
+    for(i=0; i<4; i++) {
+        index = ep[i];
+        after_ep[i] = right_after_ip[index - 1];
     }
 
-    for(int i=0;i<4;i++){
-        left_half[i] ^=after_p4[i];
+    for(i=4; i<8; i++) {
+        index = ep[i];
+        after_ep[i] = right_after_ip[index - 1];
+    }
+   
+    for(i=0; i<8; i++)
+        k1[i] = k1[i] ^ after_ep[i];
+  
+//left part of key1
+    row = to_digit(k1[0],k1[3]);
+    col = to_digit(k1[1],k1[2]);
+    s0 = s_matrix0[row][col];
+
+    to_binary(s0);
+    for(j=0; j<2; j++)
+        s0_binary[j] = result[j];
+       
+//right part of key1
+    row = to_digit(k1[4],k1[7]);
+    col = to_digit(k1[5],k1[6]);
+
+    s1 = s_matrix1[row][col];
+
+    to_binary(s1);
+    for(j=0; j<2; j++)
+        s1_binary[j] = result[j];
+
+    for(j=0; j<2; j++)
+        S[j] = s0_binary[j];
+
+    for(i=0,j=2; i<2,j<4; i++,j++)
+        S[j] = s1_binary[i];
+
+    for(i=0; i<4; i++) {
+        index = p4[i];
+        after_p4[i] = S[index - 1];
     }
 
+    for(i=0; i<4; i++)
+        after_p4[i] = after_p4[i] ^ left_after_ip[i];
+
+    for(i=0; i<4; i++)
+        after_one[i] = right_after_ip[i];
+
+    for(i=0,j=4; i<4,j<8; i++,j++)
+        after_one[j] = after_p4[i];
+
+//same after ep
+    for(j=0; j<4; j++)
+        left_after_one[j] = after_one[j];
+
+    for(j=0; j<4; j++)
+        right_after_one[j] = after_one[j+4];
+
+    for(i=0; i<4; i++) {
+        index = ep[i];
+        after_ep[i] = right_after_one[index - 1];
+    }
+
+    for(i=4; i<8; i++) {
+        index = ep[i];
+        after_ep[i] = right_after_one[index - 1];
+    }
+   
+    for(i=0; i<8; i++)
+        k2[i] = k2[i] ^ after_ep[i];
+
+    row = to_digit(k2[0],k2[3]);
+    col = to_digit(k2[1],k2[2]);
+    s0 = s_matrix0[row][col];
+    to_binary(s0);
+
+    for(j=0; j<2; j++)
+        s0_binary[j] = result[j];
+
+    row = to_digit(k2[4],k2[7]);
+    col = to_digit(k2[5],k2[6]);
+    s1 = s_matrix1[row][col];
+    to_binary(s1);
+
+    for(j=0; j<2; j++)
+        s1_binary[j] = result[j];
+
+    for(j=0; j<2; j++)
+        S1[j] = s0_binary[j];
+
+    for(i=0,j=2; i<2,j<4; i++,j++)
+        S1[j] = s1_binary[i];
+
+    for(i=0; i<4; i++) {
+        index = p4[i];
+        after_p4[i] = S1[index - 1];
+    }
+
+    for(i=0; i<4; i++)
+        after_p4[i] = after_p4[i] ^ left_after_one[i];
+
+    for(i=0; i<4; i++)
+        after_two[i] = after_p4[i];
+
+    for(i=0,j=4; i<4,j<8; i++,j++)
+        after_two[j] = right_after_one[i];
+
+    for(i=0; i<8; i++)
+    {
+        index = ipinverse[i];
+        after_ip_inverse[i] = after_two[index - 1];
+    }   
+    printf("\n\n--->8-bit Ciphertext will be= ");
+    for(i=0; i<8; i++)
+        printf("%d ", after_ip_inverse[i]);
 }
-void main(){
-    char pt[8],ct[8];
-    int ip[]= {2,6,3,1,4,8,5,7};
-    int ip_inverse[]={4,1,3,5,7,2,8,6};
-    int k1[]={1,0,1,0,0,1,0,0};
-    int k2[]={0,1,0,0,0,0,1,1};
-
-
-    printf("Enter 8 bit plain text: ");
-    for(int i=0;i<8;i++)
-    scanf("%d",&pt[i]);
-
-    int after_ip[8], left_half[4],right_half[4];
-    for(int i=0;i<8;i++){
-        int idx=ip[i];
-        after_ip[i]=pt[idx-1];
-    }
-    for(int i=0;i<4;i++){
-        left_half[i]=after_ip[i];
-    }
-    for(int i=0;i<4;i++){
-        right_half[i]=after_ip[i+4];
-    }
-
-    s_round(left_half,right_half,k1);
-
-    //swap left and right half
-    for(int i=0;i<4;i++){
-        int temp=left_half[i];
-        left_half[i]=right_half[i];
-        right_half[i]=temp;
-    }
-    s_round(left_half,right_half,k2);
-
-     //combine 2 half
-     int after_two[8];
-     for(int i=0;i<4;i++){
-        after_two[i]=left_half[i];
-     }
-     for(int i=0;i<4;i++){
-        after_two[i+4]=right_half[i];
-     }
-
-
-    // int after_ip_inverse[8];
-    //applying ip inverse
-    for(int i=0;i<8;i++){
-       int idx=ip_inverse[i];
-        ct[i]=after_two[idx-1];
-    }
-     printf("The cipher text is : \n");
-     for(int i=0;i<8;i++){
-        printf("%d",ct[i]);
-     }
-
-}
-
