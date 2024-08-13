@@ -1,10 +1,9 @@
-//p9
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 import java.io.UnsupportedEncodingException;
 
-public class p9 {
+public class sha {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter the message to be hashed: ");
